@@ -1,0 +1,60 @@
+{
+  "name": "somov/yii2-settings",
+  "description": "Settings model",
+  "type": "yii2-extension",
+  "keywords": [
+    "yii2",
+    "model",
+    "settings"
+  ],
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Somov N",
+      "email": "somov.nn@gmail.com"
+    }
+  ],
+  "require": {
+    "somov/yii2-common": "~1.1.1"
+  },
+  "require-dev": {
+    "codeception/base": "^2.2.3",
+    "codeception/verify": "~0.3.1",
+    "codeception/specify": "~0.4.3",
+    "phpunit/phpunit": "~5"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "somov\\common\\": "src"
+    }
+  },
+
+  "autoload-dev": {
+    "classmap": [
+      "tests/classes/"
+    ]
+  },
+
+  "archive": {
+    "exclude": [
+      "/.*",
+      "/tests",
+      "/vendor",
+      "/runtime"
+    ]
+  },
+
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ],
+  "config": {
+    "process-timeout": 1800,
+    "fxp-asset": {
+      "enabled": false
+    }
+  }
+}
