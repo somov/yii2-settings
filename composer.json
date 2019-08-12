@@ -1,11 +1,12 @@
 {
   "name": "somov/yii2-settings",
-  "description": "Settings model",
+  "description": "Settings model and controller action",
   "type": "yii2-extension",
   "keywords": [
     "yii2",
     "model",
-    "settings"
+    "settings",
+    "action"
   ],
   "license": "BSD-3-Clause",
   "authors": [
@@ -15,7 +16,7 @@
     }
   ],
   "require": {
-    "somov/yii2-common": "~1.1.1"
+    "somov/yii2-common": ">=1.1.4"
   },
   "require-dev": {
     "codeception/base": "^2.2.3",
