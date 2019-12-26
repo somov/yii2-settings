@@ -134,13 +134,11 @@ trait SettingsTrait
             return $this;
         }
 
-        $old = clone $this;
-
         $this->loadDefaults()
             ->updateSettingsAttributes($this->getDriver()->read($this))
             ->setIsSettingsLoaded(true);
 
-        $this->setOldSettings($old);
+        $this->setOldSettings(clone $this);
 
         Event::trigger($this, self::EVENT_LOAD);
 

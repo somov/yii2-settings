@@ -76,6 +76,7 @@ class Action extends \yii\base\Action
     {
 
         $sections = $this->controllerSections();
+        $models = [];
 
         if (isset($this->modelClass)) {
             array_unshift($sections, [
@@ -93,16 +94,14 @@ class Action extends \yii\base\Action
             if (empty($section['model'])) {
                 throw new InvalidConfigException('$model attribute required ');
             }
-            $section['model'] = $this->instantiateModel($section['model']);
+
+            $model =  $this->instantiateModel($section['model']);
+            $section['model'] = $model;
+            $models[] = $model;
         }
 
 
         if (\Yii::$app->request->isPost) {
-
-            $models = array_map(function (&$m) {
-                return $m['model'];
-            }, $sections);
-
             if ($this->processModels($models)) {
                 $this->onSuccess($models);
             } else {
@@ -129,7 +128,10 @@ class Action extends \yii\base\Action
             return $content;
         }
 
-        return $this->controller->render($this->viewName, ['sections' => $sections]);
+        return $this->controller->render($this->viewName, [
+            'sections' => $sections,
+            'model' => reset($models)
+        ]);
 
     }
 
