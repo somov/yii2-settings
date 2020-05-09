@@ -20,7 +20,7 @@ class ModelTest extends Codeception\TestCase\Test
 
     public function testUpdate()
     {
-        $model  = new TestSettingsModel();
+        $model  = TestSettingsModel::instance();
         $model->propertyString = 'test';
         $model->propertyInteger = '0';
         $model->propertyArray = ['a', 'b', 'c'];

@@ -9,13 +9,15 @@
 
 namespace somov\settings;
 
-use Common\ModelReflection\ModelClass;
-use Common\ModelReflection\ModelProperty;
+use somov\common\classInfo\ClassInfo;
+use somov\common\classInfo\ClassInfoDataInterface;
+use somov\common\classInfo\Property;
 use somov\common\traits\ContainerCompositions;
 use somov\settings\drivers\ArrayConfig;
 use yii\base\ArrayableTrait;
 use yii\base\Event;
 use yii\base\StaticInstanceInterface;
+use yii\base\StaticInstanceTrait;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -31,7 +33,7 @@ use yii\helpers\ArrayHelper;
 trait SettingsTrait
 {
 
-    use ArrayableTrait, ContainerCompositions;
+    use StaticInstanceTrait, ArrayableTrait, ContainerCompositions;
 
     /**
      * @var array
@@ -47,6 +49,7 @@ trait SettingsTrait
      * @var self
      */
     private $_oldSettings;
+
 
     /**
      * @param bool $refresh
@@ -85,6 +88,30 @@ trait SettingsTrait
         return $result;
     }
 
+
+    /**
+     * @return SettingsTrait
+     */
+    protected function normalizeType()
+    {
+
+        $properties = $this->getSettingsProperties();
+
+        foreach ($this->settingsAttributes() as $attribute => $value) {
+            if (empty($properties[$attribute])) {
+                continue;
+            }
+
+            $type = $properties[$attribute]->getType();
+
+            if (isset($value) && $type->isSimple()) {
+                settype($value, $type->getType());
+                $this->$attribute = $value;
+            }
+        }
+        return $this;
+    }
+
     /**
      * @return boolean
      */
@@ -97,28 +124,15 @@ trait SettingsTrait
             }
         }
 
-        $properties = $this->getSettingsProperties();
+        $this->normalizeType();
 
-        foreach ($this->settingsAttributes() as $attribute => $value) {
-            if (empty($properties[$attribute])) {
-                continue;
-            }
-            $type = $properties[$attribute]->getType();
-
-            if (isset($value) && $type->getAnnotatedType() !== 'any' && gettype($value) !== $type->getAnnotatedType()) {
-                settype($value, $type->getAnnotatedType());
-                $this->$attribute = $value;
-            }
-
+        if ($result = $this->getDriver()->write($this)) {
+            Event::trigger($this, self::EVENT_UPDATE);
         }
-
-        $result = $this->getDriver()->write($this);
 
         if ($result && $this->hasMethod('afterUpdateSettings')) {
             $this->afterUpdateSettings($this->getOldSettings());
         }
-
-        Event::trigger($this, self::EVENT_UPDATE);
 
         return $result;
     }
@@ -134,8 +148,10 @@ trait SettingsTrait
             return $this;
         }
 
+        $attributes = $this->getDriver()->read($this);
         $this->loadDefaults()
-            ->updateSettingsAttributes($this->getDriver()->read($this))
+            ->updateSettingsAttributes($attributes)
+            ->normalizeType()
             ->setIsSettingsLoaded(true);
 
         $this->setOldSettings(clone $this);
@@ -146,25 +162,17 @@ trait SettingsTrait
     }
 
     /**
-     * @return ModelProperty[]
+     * @return Property[]
      */
     private function getSettingsProperties()
     {
-        return $this->getCompositionFromFactory(function () {
-
-            $properties = ArrayHelper::index((new ModelClass($this))->getProperties(), function ($item) {
-                /** @var ModelProperty|mixed $item */
-                return $item->getName();
-            });
-
-            return $properties;
-        }, ModelProperty::class);
-
+        return ArrayHelper::index((new ClassInfo($this, null))
+            ->getProperties(ClassInfoDataInterface::VISIBILITY_PUBLIC), 'name');
     }
 
     /**
      * @param array $attributes
-     * @return SettingsTrait
+     * @return SettingsInterface|$this
      */
     protected function updateSettingsAttributes(array $attributes)
     {
@@ -277,6 +285,23 @@ trait SettingsTrait
     public function setSettingsDriver($settingsDriver)
     {
         $this->_settingsDriver = $settingsDriver;
+    }
+
+
+    /**
+     * @param null $filter
+     * @return array
+     */
+    public function defaultDifference($filter = null)
+    {
+        if (method_exists($this, 'defaultSettings()')) {
+            $difference = array_diff_assoc($this->settingsAttributes(), $this->defaultSettings());
+            if (!empty($difference) && is_array($filter)) {
+                return ArrayHelper::filter($difference, $filter);
+            }
+            return $difference;
+        }
+        return $this->settingsAttributes();
     }
 
 

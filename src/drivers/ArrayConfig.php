@@ -14,8 +14,13 @@ use somov\settings\DriverInterface;
 use somov\settings\SettingsInterface;
 use yii\base\BaseObject;
 use yii\helpers\Inflector;
+use yii\helpers\ReplaceArrayValue;
 use yii\helpers\StringHelper;
 
+/**
+ * Class ArrayConfig
+ * @package somov\settings\drivers
+ */
 class ArrayConfig extends BaseObject implements DriverInterface
 {
     /**
@@ -69,9 +74,10 @@ class ArrayConfig extends BaseObject implements DriverInterface
     public function write(SettingsInterface $settings)
     {
         $config = (new ConfigurationArrayFile($this->getFileName($settings)))
+            ->clear()
             ->mergeWith($settings->settingsAttributes())
             ->write();
-
+        
         return $config->count() > 0;
     }
 

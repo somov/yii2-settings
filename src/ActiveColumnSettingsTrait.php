@@ -10,9 +10,8 @@ namespace somov\settings;
 
 
 use somov\settings\drivers\ActiveColumn;
+use wvsConverter\models\settings\codec\H264;
 use yii\base\InvalidCallException;
-use yii\base\InvalidConfigException;
-use yii\base\StaticInstanceTrait;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -20,7 +19,7 @@ use yii\helpers\ArrayHelper;
  * Class ActiveColumnSettings
  * @package somov\settings
  */
-class ActiveColumnSettings extends SettingsModel
+trait ActiveColumnSettingsTrait
 {
 
     /**
@@ -41,11 +40,6 @@ class ActiveColumnSettings extends SettingsModel
     {
         $this->_record = ArrayHelper::remove($config, 'record');
         $this->_attribute = ArrayHelper::remove($config, 'attribute');
-
-        if (empty($this->_record) || empty($this->_attribute)) {
-            throw new InvalidCallException('Property record and attribute required');
-        }
-
 
         parent::__construct($config);
 

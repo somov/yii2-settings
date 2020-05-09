@@ -16,7 +16,7 @@
     }
   ],
   "require": {
-    "somov/yii2-common": ">=1.1.4"
+    "somov/yii2-common": ">=1.1.5"
   },
   "require-dev": {
     "codeception/base": "^2.2.3",
