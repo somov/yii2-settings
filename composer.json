@@ -22,7 +22,8 @@
     "codeception/base": "^2.2.3",
     "codeception/verify": "~0.3.1",
     "codeception/specify": "~0.4.3",
-    "phpunit/phpunit": "~5"
+    "phpunit/phpunit": "~5",
+    "somov/yii2-common": "dev-master"
   },
 
   "autoload": {

@@ -13,6 +13,7 @@ namespace somov\settings;
  * Interface ConfiguratorBehaviorInterface
  * @package somov\settings
  * @method  array configurableProperties() массив настроек
+ * @property array $settingModels
  */
 interface ConfiguratorBehaviorInterface
 {

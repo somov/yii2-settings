@@ -160,9 +160,8 @@ trait MultipleSettingsTrait
         }
 
         $item = \Yii::createObject($type);
-        $item->loadDefaults();
-
         $this->addItem($item, $index);
+        $item->loadDefaults();
 
         return $item;
     }

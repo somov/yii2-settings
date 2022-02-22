@@ -8,7 +8,10 @@
 
 namespace somov\settings;
 
-
+/**
+ * Interface DriverInterface
+ * @package somov\settings
+ */
 interface DriverInterface
 {
     /**

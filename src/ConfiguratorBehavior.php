@@ -78,7 +78,7 @@ class ConfiguratorBehavior extends Behavior implements ConfiguratorBehaviorInter
         /** @var SettingsInterface $settings */
         foreach ((array)$this->settingModels as $settings) {
 
-            $settings = $settings::instance();
+            $settings = (is_string($settings)) ? $settings::instance() : $settings;
 
             $settingsAttributes = $settings->settingsAttributes();
 

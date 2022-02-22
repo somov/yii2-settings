@@ -16,6 +16,7 @@ use somov\common\traits\ContainerCompositions;
 use somov\settings\drivers\ArrayConfig;
 use yii\base\ArrayableTrait;
 use yii\base\Event;
+use yii\base\Model;
 use yii\base\StaticInstanceInterface;
 use yii\base\StaticInstanceTrait;
 use yii\helpers\ArrayHelper;
@@ -24,11 +25,12 @@ use yii\helpers\ArrayHelper;
  * Trait SettingsTrait
  * @package somov\settings
  *
- * @property-read object|SettingsInterface $oldSettings
+ * @property-read SettingsInterface|$this $oldSettings
  * @property-read array|string $settingsDriver
  * @method $this defaultSettings()
  * @method void beforeUpdateSettings()
  * @method void afterUpdateSettings($this)
+ * @method SettingsInterface[] getNestedModels
  */
 trait SettingsTrait
 {
@@ -151,7 +153,7 @@ trait SettingsTrait
         $attributes = $this->getDriver()->read($this);
         $this->loadDefaults()
             ->updateSettingsAttributes($attributes)
-            ->normalizeType()
+            //->normalizeType()
             ->setIsSettingsLoaded(true);
 
         $this->setOldSettings(clone $this);
@@ -166,8 +168,9 @@ trait SettingsTrait
      */
     private function getSettingsProperties()
     {
-        return ArrayHelper::index((new ClassInfo($this, null))
-            ->getProperties(ClassInfoDataInterface::VISIBILITY_PUBLIC), 'name');
+        return ArrayHelper::index((new ClassInfo($this, null, [
+            'processParents' => true
+        ]))->getProperties(ClassInfoDataInterface::VISIBILITY_PUBLIC), 'name');
     }
 
     /**
@@ -294,14 +297,22 @@ trait SettingsTrait
      */
     public function defaultDifference($filter = null)
     {
-        if (method_exists($this, 'defaultSettings()')) {
-            $difference = array_diff_assoc($this->settingsAttributes(), $this->defaultSettings());
-            if (!empty($difference) && is_array($filter)) {
-                return ArrayHelper::filter($difference, $filter);
-            }
-            return $difference;
+
+        if (method_exists($this, 'defaultSettings')) {
+            $attributes = $this->defaultSettings();
+        } else {
+            /** @var SettingsInterface $class */
+            $class = static::class;
+            $attributes = (new $class)->settingsAttributes();
         }
-        return $this->settingsAttributes();
+
+        $difference = array_diff_assoc($this->settingsAttributes(), $attributes);
+        if (!empty($difference) && is_array($filter)) {
+            return ArrayHelper::filter($difference, $filter);
+        }
+
+        return $difference;
+
     }
 
 

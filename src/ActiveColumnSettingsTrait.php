@@ -10,7 +10,6 @@ namespace somov\settings;
 
 
 use somov\settings\drivers\ActiveColumn;
-use wvsConverter\models\settings\codec\H264;
 use yii\base\InvalidCallException;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
